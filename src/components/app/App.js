@@ -1,41 +1,37 @@
-import { Component } from "react";
+import { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
+import Spinner from '../spinner/Spinner';
 import AppHeader from "../appHeader/AppHeader";
-import RandomChar from "../randomChar/RandomChar";
-import CharList from "../charList/CharList";
-import CharInfo from "../charInfo/CharInfo";
-import ErrorBoundary from "../errorBoundary/ErrorBoundary";
+// import { ComicsPage, MainPage, Page404, SingleComicPage } from "../pages";
 
-import decoration from '../../resources/img/vision.png';
+import './app.css';
 
-class App extends Component {
-    state = {
-        selectedChar: null,
-    }
 
-    onCharSelected = (id) => {
-        this.setState({
-            selectedChar: id,
-        })
-    }
+const Page404 = lazy(() => import('../pages/404'));
+const MainPage = lazy(() => import('../pages/MainPage'));
+const ComicsPage = lazy(() => import('../pages/ComicsPage'));
+const SingleComicPage = lazy(() => import('../pages/SingleComicsPage'));
 
-    render() {
-        return (
+const App = () => {
+    return (
+        <Router>
             <div className="app">
-                <AppHeader/>
+                <AppHeader />
                 <main>
-                    <RandomChar/>
-                    <div className="char__content">
-                        <CharList onCharSelected={this.onCharSelected} />
-                        <ErrorBoundary>
-                            <CharInfo charId={this.state.selectedChar}/>
-                        </ErrorBoundary>
-                    </div>
-                    <img className="bg-decoration" src={decoration} alt="vision"/>
+                    <Suspense fallback={<Spinner />}>
+                        <Routes>
+                            <Route path="/" element={<MainPage />} />
+                            <Route path="/comics" element={<ComicsPage />} />
+                            <Route path="/comics/:comicsId" element={<SingleComicPage />} />
+                            <Route path="*" element={<Page404 />} />
+                        </Routes>
+                    </Suspense>
                 </main>
             </div>
-        )
-    }
+        </Router>
+    )
+
 }
 
 export default App;
